@@ -1,8 +1,11 @@
 <script setup>
+// let a = 10;
 </script>
 
 <template>
-  Привет!
+  <header>Привет!</header>
+  <main>Foo</main>
+  <footer>Bar</footer>
 </template>
 
 <style scoped>
