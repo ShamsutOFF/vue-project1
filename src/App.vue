@@ -1,11 +1,9 @@
 <script setup>
-// let a = 10;
+const currentDate = new Date();
 </script>
 
 <template>
-  <header>Привет!</header>
-  <main>Foo</main>
-  <footer>Bar</footer>
+  <div>{{ currentDate }}</div>
 </template>
 
 <style scoped>
