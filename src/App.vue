@@ -4,7 +4,10 @@ import Button from "@/components/Button.vue";
 </script>
 
 <template>
-  <Button>Сохранить</Button>
+  <Button>
+    <template #icon>+</template>
+    Сохранить
+  </Button>
 </template>
 
 <style scoped>

@@ -3,7 +3,10 @@
 
 <template>
   <button class="button">
-    <slot></slot>
+    <div>
+      <slot name="icon"/>
+    </div>
+    <slot/>
   </button>
 </template>
 
