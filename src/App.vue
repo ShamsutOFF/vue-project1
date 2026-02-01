@@ -1,12 +1,10 @@
 <script setup>
 import Button from "@/components/Button.vue";
 
-// const currentDate = new Date();
 </script>
 
 <template>
-  <!--  <div>{{ currentDate }}</div>-->
-  <Button/>
+  <Button>Сохранить</Button>
 </template>
 
 <style scoped>
