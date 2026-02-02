@@ -3,4 +3,20 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    --color-bg-main: #F0F4F8;
+    --color-blue-button: #008BFE;
+    --color-blue-button-hover: #006FCB;
+
+    --color-white: #FFFFFF;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--color-bg-main);
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
 }
