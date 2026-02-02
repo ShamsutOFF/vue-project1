@@ -2,19 +2,21 @@
 import IconLocation from "@/icons/IconLocation.vue";
 import Button from "@/components/Button.vue";
 
-function log() {
-  console.log("log function called");
+const emit = defineEmits(["select-city"]);
+
+function select() {
+  emit("select-city", "London");
 }
 </script>
 
 <template>
-  <Button @click="log">
+  <Button @click="select()">
     <template #icon>
       <IconLocation/>
     </template>
     Изменить город
   </Button>
-  <input />
+  <input/>
   <Button>
     Сохранить
   </Button>

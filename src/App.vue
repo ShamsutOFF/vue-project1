@@ -6,13 +6,18 @@ const data = {
   label: "ВЛАЖНОСТЬ",
   stat: "90%"
 }
+
+function getCity(city) {
+  console.log(city);
+}
+
 </script>
 
 <template>
   <main class="main">
     <Stat v-bind="data"></Stat>
     <Stat label="ОСАДКИ" stat="0%"></Stat>
-    <CitySelect/>
+    <CitySelect @select-city="getCity"/>
   </main>
 </template>
 
