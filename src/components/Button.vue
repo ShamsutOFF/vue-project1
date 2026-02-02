@@ -11,6 +11,7 @@
 </template>
 
 <style scoped>
+
 .button {
   border: none;
   border-radius: 10px;
@@ -20,6 +21,9 @@
   font-size: 20px;
   color: var(--color-primary);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 9px;
 }
 
 .button:hover {
