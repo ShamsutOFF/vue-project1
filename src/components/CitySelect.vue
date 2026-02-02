@@ -1,10 +1,14 @@
 <script setup>
 import IconLocation from "@/icons/IconLocation.vue";
 import Button from "@/components/Button.vue";
+
+function log() {
+  console.log("log function called");
+}
 </script>
 
 <template>
-  <Button>
+  <Button @click="log">
     <template #icon>
       <IconLocation/>
     </template>
