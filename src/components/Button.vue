@@ -3,9 +3,9 @@
 
 <template>
   <button class="button">
-    <div>
+    <span>
       <slot name="icon"/>
-    </div>
+    </span>
     <slot/>
   </button>
 </template>
