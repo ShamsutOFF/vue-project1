@@ -5,7 +5,8 @@ import Stat from "@/components/Stat.vue";
 
 <template>
   <main class="main">
-    <Stat></Stat>
+    <Stat label="ВЛАЖНОСТЬ" stat="90%"></Stat>
+    <Stat label="ОСАДКИ" stat="0%"></Stat>
     <Button>
       Сохранить
     </Button>
