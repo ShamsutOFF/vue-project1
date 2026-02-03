@@ -6,7 +6,7 @@ import Score from "@/components/Score.vue";
 <template>
   <header>
     <h1>ЗАПОМНИ СЛОВО</h1>
-    <Score/>
+    <Score :score="100" />
   </header>
 </template>
 

@@ -1,11 +1,15 @@
 <script setup>
 
 import IconHeart from "@/components/Icons/IconHeart.vue";
+
+const {score = 0} = defineProps({
+  score: Number
+})
 </script>
 
 <template>
   <div class="score_card">
-    <span>100</span>
+    <span>{{ score }}</span>
     <IconHeart></IconHeart>
   </div>
 </template>
