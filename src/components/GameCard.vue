@@ -1,31 +1,49 @@
 <script setup>
-import { ref } from 'vue'
 
-const isFlipped = ref(false)
-const status = ref('default') // default, correct, incorrect
-
-const flipCard = () => {
-  isFlipped.value = !isFlipped.value
-
-  // Для примера меняем статус при перевороте
-  // В реальной игре это будет зависеть от логики проверки ответа
-  if (isFlipped.value) {
-    status.value = 'correct' // или 'incorrect'
+// Определяем все необходимые пропсы
+defineProps({
+  word: {
+    type: String,
+    required: true
+  },
+  translation: {
+    type: String,
+    required: true
+  },
+  state: {
+    type: String,
+    validator(value) {
+      return ['closed', 'opened'].includes(value)
+    },
+    default: 'closed'
+  },
+  status: {
+    type: String,
+    validator(value) {
+      return ['success', 'fail', 'pending'].includes(value)
+    },
+    default: 'pending'
   }
+});
+// Если нужно обрабатывать клик, но состояние изменять в родителе
+const emit = defineEmits(['flip'])
+
+const handleClick = () => {
+  emit('flip') // Сообщаем родителю о клике
 }
 </script>
 
 <template>
   <div
       class="card"
-      :class="[{ flipped: isFlipped }, `status-${status}`]"
-      @click="flipCard"
+      :class="[{ flipped: state === 'opened' }, `status-${status}`]"
+      @click="handleClick"
   >
     <div class="card-header">
       <div class="card-number">09</div>
     </div>
     <div class="card-content">
-      <div class="card-text">oscillotron</div>
+      <span class="card-text">{{ state === 'closed' ? word : translation }}</span>
     </div>
     <div class="card-footer">
       ПЕРЕВЕНУТЬ
