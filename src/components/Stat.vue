@@ -3,6 +3,11 @@ const {label = "Не задано", stat = "0%"} = defineProps({
   label: String,
   stat: String
 })
+// Старый подход:
+// const defProps = withDefaults(defineProps({
+//   label: String,
+//   stat: String
+// }), { label : "No def val"});
 </script>
 
 <template>
