@@ -5,6 +5,8 @@
     -moz-osx-font-smoothing: grayscale;
 
     --color-bg-main: #F0F4F8;
+    --color-text-main: #222222;
+    --color-light-blue: #CCE8FF;
     --color-blue-button: #008BFE;
     --color-blue-button-hover: #006FCB;
 
