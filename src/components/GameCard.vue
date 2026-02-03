@@ -1,5 +1,26 @@
+<script setup>
+import { ref } from 'vue'
+
+const isFlipped = ref(false)
+const status = ref('default') // default, correct, incorrect
+
+const flipCard = () => {
+  isFlipped.value = !isFlipped.value
+
+  // Для примера меняем статус при перевороте
+  // В реальной игре это будет зависеть от логики проверки ответа
+  if (isFlipped.value) {
+    status.value = 'correct' // или 'incorrect'
+  }
+}
+</script>
+
 <template>
-  <div class="card">
+  <div
+      class="card"
+      :class="[{ flipped: isFlipped }, `status-${status}`]"
+      @click="flipCard"
+  >
     <div class="card-header">
       <div class="card-number">09</div>
     </div>
@@ -24,7 +45,7 @@
   align-items: center;
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   transform-style: preserve-3d;
   box-shadow: 0 0 16px 0 #0000001A;
 }
@@ -40,12 +61,25 @@
   border-radius: 8px;
   pointer-events: none;
   z-index: 1;
+  transition: border-color 0.3s ease;
 }
 
-.card:hover {
+.card:hover:not(.flipped) {
   cursor: pointer;
   transform: scale(1.01);
   box-shadow: 10px 10px 10px 0 #0000000D;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card.status-correct::before {
+  border-color: var(--color-success, #22c55e);
+}
+
+.card.status-incorrect::before {
+  border-color: var(--color-error, #ef4444);
 }
 
 .card-header {
