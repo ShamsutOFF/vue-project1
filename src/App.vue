@@ -20,12 +20,12 @@ onMounted(() => {
 const dataModified = computed(() => {
   return [
     {
-      label: "Влажность",
-      stat: data.value.humidity
-    },
-    {
       label: "Температура",
       stat: data.value.temperature
+    },
+    {
+      label: "Влажность",
+      stat: data.value.humidity
     },
     {
       label: "Ветер",
@@ -41,9 +41,12 @@ async function getCity(city) {
     days: 3
   });
   const response = await fetch(`${API_ENDPOINT}/forecast.json?${params.toString()}`)
-  const data = await response.json();
-  console.log(data);
-  savedCity.value = data.location.name;
+  const resData = await response.json();
+  console.log(resData);
+  data.value.humidity = resData.current.humidity + "%";
+  data.value.temperature = resData.current.temp_c + "°C";
+  data.value.wind = resData.current.wind_kph + " м/с";
+  savedCity.value = resData.location.name;
 }
 
 </script>
