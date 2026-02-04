@@ -10,6 +10,7 @@ const emit = defineEmits({
   },
 });
 
+let city = ref("Moscow");
 let isEdited = ref(false);
 
 function select() {
@@ -24,17 +25,20 @@ function edit() {
 </script>
 
 <template>
+  {{city}}
   <div class="city-select">
-  <div v-show="isEdited" class="city-input">
-    <Input placeholder="Введите город"/>
-    <Button @click="select()">Сохранить</Button>
-  </div>
-  <Button v-show="!isEdited" @click="edit()">
-    <template #icon>
-      <IconLocation/>
-    </template>
-    Изменить город
-  </Button>
+    <div v-show="isEdited" class="city-input">
+      <Input
+          v-model="city"
+          placeholder="Введите город"/>
+      <Button @click="select()">Сохранить</Button>
+    </div>
+    <Button v-show="!isEdited" @click="edit()">
+      <template #icon>
+        <IconLocation/>
+      </template>
+      Изменить город
+    </Button>
   </div>
 </template>
 

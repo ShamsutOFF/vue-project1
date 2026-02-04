@@ -1,9 +1,12 @@
 <script setup>
-
+const model = defineModel();
 </script>
 
 <template>
-  <input class="input"/>
+  <input
+      v-model="model"
+      class="input"
+      placeholder="Введите город"/>
 </template>
 
 <style scoped>
