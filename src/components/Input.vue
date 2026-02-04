@@ -1,10 +1,10 @@
 <script setup>
-const model = defineModel();
+const data = defineModel({type: String, required: true});
 </script>
 
 <template>
   <input
-      v-model="model"
+      v-model="data"
       class="input"
       placeholder="Введите город"/>
 </template>
