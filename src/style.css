@@ -11,6 +11,8 @@
     --color-blue-button-hover: #006FCB;
 
     --color-white: #FFFFFF;
+    --color-success: #09BB00;
+    --color-error: #D00303;
 }
 
 body {
