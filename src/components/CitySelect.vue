@@ -29,8 +29,9 @@ function edit() {
     <div v-show="isEdited" class="city-input">
       <Input
           v-model="city"
-          placeholder="Введите город"/>
-      <Button @click="select()">Сохранить</Button>
+          placeholder="Введите город"
+          @keyup.enter="select"/>
+      <Button @click="select">Сохранить</Button>
     </div>
     <Button v-show="!isEdited" @click="edit()">
       <template #icon>
