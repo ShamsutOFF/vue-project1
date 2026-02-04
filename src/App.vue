@@ -1,13 +1,20 @@
 <script setup>
 import Stat from "@/components/Stat.vue";
 import CitySelect from "@/components/CitySelect.vue";
-import {computed, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
+
+const API_ENDPOINT = "https://api.weatherapi.com/v1";
+const apiKey = import.meta.env.VITE_API_KEY
 
 let savedCity = ref("Moscow");
 let data = ref({
   humidity: "75%",
   temperature: "20°C",
   wind: "10 м/с"
+});
+
+onMounted(() => {
+  getCity(savedCity.value);
 });
 
 const dataModified = computed(() => {
@@ -27,7 +34,16 @@ const dataModified = computed(() => {
 });
 
 async function getCity(city) {
-  savedCity.value = city;
+  const params = new URLSearchParams({
+    query: city,
+    key: apiKey,
+    lang: "ru",
+    days: 3
+  });
+  const response = await fetch(`${API_ENDPOINT}/forecast.json?${params.toString()}`)
+  const data = await response.json();
+  console.log(data);
+  savedCity.value = data.location.name;
 }
 
 </script>

@@ -15,7 +15,7 @@ let isEdited = ref(false);
 
 function select() {
   isEdited.value = false;
-  emit("selectCity", "London");
+  emit("selectCity", city.value);
 }
 
 function edit() {
@@ -25,7 +25,6 @@ function edit() {
 </script>
 
 <template>
-  {{city}}
   <div class="city-select">
     <div v-show="isEdited" class="city-input">
       <Input
