@@ -21,8 +21,11 @@
   font-size: 20px;
   color: var(--color-primary);
   cursor: pointer;
+  height: 53px;
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 9px;
 }
 
