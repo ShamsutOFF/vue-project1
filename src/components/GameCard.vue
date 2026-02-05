@@ -1,71 +1,141 @@
 <script setup>
+import { computed } from 'vue'
 
-// Определяем все необходимые пропсы
-defineProps({
-  word: {
-    type: String,
+const props = defineProps({
+  card: {
+    type: Object,
     required: true
-  },
-  translation: {
-    type: String,
-    required: true
-  },
-  state: {
-    type: String,
-    validator(value) {
-      return ['closed', 'opened'].includes(value)
-    },
-    default: 'closed'
-  },
-  status: {
-    type: String,
-    validator(value) {
-      return ['success', 'fail', 'pending'].includes(value)
-    },
-    default: 'pending'
   }
-});
-// Если нужно обрабатывать клик, но состояние изменять в родителе
-const emit = defineEmits(['flip'])
+})
 
-const handleClick = () => {
-  emit('flip') // Сообщаем родителю о клике
+const emit = defineEmits(['flip', 'answer'])
+
+const isClickable = computed(() => props.card.status === 'default')
+const isFlipped = computed(() => props.card.status !== 'default')
+const showButtons = computed(() => props.card.status === 'flipped')
+const isFinished = computed(() =>
+    props.card.status === 'correct' || props.card.status === 'incorrect'
+)
+
+const handleCardClick = () => {
+  if (isClickable.value) {
+    emit('flip', props.card.id)
+  }
+}
+
+const handleYes = () => {
+  emit('answer', props.card.id, true)
+}
+
+const handleNo = () => {
+  emit('answer', props.card.id, false)
 }
 </script>
 
 <template>
   <div
-      class="card"
-      :class="[{ flipped: state === 'opened' }, `status-${status}`]"
-      @click="handleClick"
+      class="card-wrapper"
+      :class="{ flipped: isFlipped, clickable: isClickable }"
+      @click="handleCardClick"
   >
-    <div class="card-header">
-      <div class="card-number">09</div>
+    <!-- Лицевая сторона -->
+    <div class="card card-front" :class="`status-${card.status}`">
+      <div v-if="isFinished" class="result-icon">
+        <div class="icon-badge" :class="card.status === 'correct' ? 'badge-success' : 'badge-error'">
+          <span v-if="card.status === 'correct'">✓</span>
+          <span v-else>✗</span>
+        </div>
+      </div>
+
+      <div class="card-header">
+        <div class="card-number">{{ card.number }}</div>
+      </div>
+
+      <div class="card-content">
+        <div class="card-text">{{ card.word }}</div>
+      </div>
+
+      <div class="card-footer">
+        <div v-if="isFinished">ЗАВЕРШЕНО</div>
+        <div v-else>ПЕРЕВЕНУТЬ</div>
+      </div>
     </div>
-    <div class="card-content">
-      <span class="card-text">{{ state === 'closed' ? word : translation }}</span>
-    </div>
-    <div class="card-footer">
-      ПЕРЕВЕНУТЬ
+
+    <!-- Обратная сторона -->
+    <div class="card card-back" :class="`status-${card.status}`">
+      <div v-if="isFinished" class="result-icon">
+        <div class="icon-badge" :class="card.status === 'correct' ? 'badge-success' : 'badge-error'">
+          <span v-if="card.status === 'correct'">✓</span>
+          <span v-else>✗</span>
+        </div>
+      </div>
+
+      <div class="card-header">
+        <div class="card-number">{{ card.number }}</div>
+      </div>
+
+      <div class="card-content">
+        <div class="card-text">{{ card.translation }}</div>
+      </div>
+
+      <div class="card-footer">
+        <div v-if="showButtons" class="answer-buttons">
+          <button @click.stop="handleNo" class="btn-icon btn-error">
+            <span>✗</span>
+          </button>
+          <button @click.stop="handleYes" class="btn-icon btn-success">
+            <span>✓</span>
+          </button>
+        </div>
+        <div v-else-if="isFinished">ЗАВЕРШЕНО</div>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.card {
+.card-wrapper {
   width: 250px;
   height: 380px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.card-wrapper.clickable:hover {
+  cursor: pointer;
+}
+
+.card-wrapper.flipped {
+  transform: rotateY(180deg);
+}
+
+.card {
+  width: 100%;
+  height: 100%;
   border-radius: 16px;
   background-color: var(--color-white);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  transform-style: preserve-3d;
+  position: absolute;
+  backface-visibility: hidden;
   box-shadow: 0 0 16px 0 #0000001A;
+  transition: box-shadow 0.3s ease;
+}
+
+.card-front {
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+
+.card-back {
+  transform: rotateY(180deg);
+}
+
+.card-wrapper.clickable:hover .card {
+  box-shadow: 10px 10px 10px 0 #0000000D;
 }
 
 .card::before {
@@ -82,22 +152,40 @@ const handleClick = () => {
   transition: border-color 0.3s ease;
 }
 
-.card:hover:not(.flipped) {
-  cursor: pointer;
-  transform: scale(1.01);
-  box-shadow: 10px 10px 10px 0 #0000000D;
-}
-
-.card.flipped {
-  transform: rotateY(180deg);
-}
-
 .card.status-correct::before {
   border-color: var(--color-success, #22c55e);
 }
 
 .card.status-incorrect::before {
   border-color: var(--color-error, #ef4444);
+}
+
+.result-icon {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+.icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+}
+
+.badge-success {
+  background-color: var(--color-success, #22c55e);
+}
+
+.badge-error {
+  background-color: var(--color-error, #ef4444);
 }
 
 .card-header {
@@ -151,5 +239,44 @@ const handleClick = () => {
   color: var(--color-text-main);
   position: relative;
   z-index: 2;
+}
+
+.answer-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-icon {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+  padding: 0;
+}
+
+.btn-success {
+  background-color: var(--color-success, #22c55e);
+}
+
+.btn-error {
+  background-color: var(--color-error, #ef4444);
+}
+
+.btn-icon:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+}
+
+.btn-icon:active {
+  transform: scale(0.95);
 }
 </style>

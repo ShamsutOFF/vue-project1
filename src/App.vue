@@ -1,59 +1,60 @@
 <script setup>
-
+import {ref} from 'vue'
 import MainButton from "@/components/MainButton.vue";
 import Header from "@/components/Header.vue";
 import GameCard from "@/components/GameCard.vue";
-import {ref} from "vue";
 
-const score = ref(100);
-// Состояние для карт
 const cards = ref([
   {
     id: 1,
+    number: '01',
     word: 'oscillotron',
     translation: 'осциллотрон',
-    state: 'closed', // или 'opened'
-    status: 'pending' // 'success' | 'fail' | 'pending'
+    status: 'default' // default, flipped, correct, incorrect
   },
   {
     id: 2,
-    word: 'computer',
-    translation: 'компьютер',
-    state: 'closed',
-    status: 'pending'
+    number: '02',
+    word: 'quantum',
+    translation: 'квант',
+    status: 'default'
+  },
+  {
+    id: 3,
+    number: '03',
+    word: 'algorithm',
+    translation: 'алгоритм',
+    status: 'default'
   }
-  // ... другие карты
 ])
-// Функция для переворота карты
-const flipCard = (cardId) => {
-  const cardIndex = cards.value.findIndex(card => card.id === cardId)
-  if (cardIndex !== -1) {
-    // Переключаем состояние
-    cards.value[cardIndex].state =
-        cards.value[cardIndex].state === 'closed' ? 'opened' : 'closed'
 
-    // Здесь можно добавить логику проверки ответа
-    // и обновить status карты
+const handleFlip = (cardId) => {
+  const card = cards.value.find(c => c.id === cardId)
+  if (card && card.status === 'default') {
+    card.status = 'flipped'
   }
 }
 
-// Обработчик для события flip из GameCard
-const handleCardFlip = (cardId) => {
-  flipCard(cardId)
+const handleAnswer = (cardId, isCorrect) => {
+  const card = cards.value.find(c => c.id === cardId)
+  if (card && card.status === 'flipped') {
+    card.status = isCorrect ? 'correct' : 'incorrect'
+  }
 }
 </script>
 
 <template>
-  <Header :score="score"/>
-
+  <Header/>
   <div class="content">
-    <GameCard
-        :word="cards[0].word"
-        :translation="cards[0].translation"
-        :state="cards[0].state"
-        :status="cards[0].status"
-        @flip="() => handleCardFlip(cards[0].id)"
-    />
+    <div class="cards-container">
+      <GameCard
+          v-for="card in cards"
+          :key="card.id"
+          :card="card"
+          @flip="handleFlip"
+          @answer="handleAnswer"
+      />
+    </div>
     <main>
       <MainButton>Начать игру</MainButton>
     </main>
@@ -72,4 +73,10 @@ const handleCardFlip = (cardId) => {
   margin-top: 120px;
 }
 
+.cards-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 </style>
