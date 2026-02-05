@@ -20,7 +20,8 @@ let savedCity = ref("Moscow");
 let data = ref({
   humidity: "—",
   temperature: "—",
-  wind: "—"
+  wind: "—",
+  forecast: []
 });
 let error = ref(null);
 
@@ -51,7 +52,7 @@ async function getCity(city) {
     query: city,
     key: apiKey,
     lang: "ru",
-    days: 3
+    days: 4
   });
 
   try {
@@ -59,16 +60,26 @@ async function getCity(city) {
 
     if (!response.ok) {
       error.value = await response.json();
-      data.value = {};
-      return; // Не обнуляем data, показываем старые значения
+      data.value = {
+        humidity: "—",
+        temperature: "—",
+        wind: "—",
+        forecast: []
+      };
+      return;
     }
-
     error.value = null;
     const resData = await response.json();
+    console.log(resData);
 
+    // Сохраняем текущую погоду
     data.value.humidity = resData.current.humidity + "%";
     data.value.temperature = resData.current.temp_c + "°C";
     data.value.wind = resData.current.wind_kph + " км/ч";
+
+    // Сохраняем прогноз!
+    data.value.forecast = resData.forecast?.forecastday || [];
+
     savedCity.value = resData.location.name;
 
   } catch (err) {
@@ -81,11 +92,36 @@ async function getCity(city) {
 <template>
   <main class="main">
     <Error v-if="error" :error="errorDisplay"/>
-    <DayCard :date="new Date()" temperature="30" weather-code="1000"/>
-    <div v-if="!error" id="city">{{ savedCity }}</div>
-    <!-- dataModified всегда будет массивом -->
-    <Stat v-for="item in dataModified" v-bind="item" :key="item.label"/>
-    <CitySelect @select-city="getCity"/>
+
+    <!-- Статистика -->
+    <div class="stats-section">
+      <Stat
+          v-for="item in dataModified"
+          v-bind="item"
+          :key="item.label"
+      />
+    </div>
+
+    <!-- Прогноз с карточками -->
+    <div
+        v-if="data && data.forecast && data.forecast.length > 0"
+        class="forecast-section"
+    >
+      <div class="day-card-list">
+        <DayCard
+            v-for="item in data.forecast"
+            :key="item.date"
+            :date="new Date(item.date)"
+            :temperature="item.day.avgtemp_c"
+            :weather-code="item.day.condition.code"
+        />
+      </div>
+    </div>
+
+    <!-- Выбор города -->
+    <div class="city-select-section">
+      <CitySelect @select-city="getCity"/>
+    </div>
   </main>
 </template>
 
@@ -94,5 +130,31 @@ async function getCity(city) {
   background: var(--color-bg-main);
   padding: 60px 50px;
   border-radius: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 70px;
+}
+
+/* Секция прогноза */
+.forecast-section {
+  width: 100%;
+}
+
+.day-card-list {
+  width: 420px; /* Фиксированная ширина как у CitySelect */
+  display: flex;
+  gap: 1px; /* или нужное расстояние */
+  justify-content: space-between; /* равномерное распределение */
+}
+
+:deep(.day-card) {
+  flex: 1; /* Растягиваются равномерно */
+  min-width: 0; /* Важно для корректного сжатия текста */
+}
+
+/* Секция выбора города */
+.city-select-section {
+  display: flex;
+  justify-content: center;
 }
 </style>
