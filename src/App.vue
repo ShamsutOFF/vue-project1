@@ -3,6 +3,9 @@ import Stat from "@/components/Stat.vue";
 import CitySelect from "@/components/CitySelect.vue";
 import Error from "@/components/Error.vue";
 import { computed, onMounted, ref } from "vue";
+import IconSun from "@/icons/weather/IconSun.vue";
+import IconCloud from "@/icons/weather/IconCloud.vue";
+import IconRain from "@/icons/weather/IconRain.vue";
 
 const API_ENDPOINT = "https://api.weatherapi.com/v1";
 const apiKey = import.meta.env.VITE_API_KEY;
@@ -80,6 +83,9 @@ async function getCity(city) {
 <template>
   <main class="main">
     <Error v-if="error" :error="errorDisplay"/>
+    <IconSun />
+    <IconCloud/>
+    <IconRain/>
     <div v-if="!error" id="city">{{ savedCity }}</div>
     <!-- dataModified всегда будет массивом -->
     <Stat v-for="item in dataModified" v-bind="item" :key="item.label"/>
