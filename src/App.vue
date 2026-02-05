@@ -1,32 +1,33 @@
 <script setup>
-import {ref} from 'vue'
+import {onMounted, ref} from 'vue'
 import MainButton from "@/components/MainButton.vue";
 import Header from "@/components/Header.vue";
 import GameCard from "@/components/GameCard.vue";
 
-const cards = ref([
-  {
-    id: 1,
-    number: '01',
-    word: 'oscillotron',
-    translation: 'осциллотрон',
-    status: 'default' // default, flipped, correct, incorrect
-  },
-  {
-    id: 2,
-    number: '02',
-    word: 'quantum',
-    translation: 'квант',
-    status: 'default'
-  },
-  {
-    id: 3,
-    number: '03',
-    word: 'algorithm',
-    translation: 'алгоритм',
-    status: 'default'
-  }
-])
+const API_URL = 'http://localhost:8080/api/random-words'
+
+function getRandomWords() {
+  return fetch(API_URL)
+      .then(response => response.json())
+}
+
+let cardId = 1;
+
+onMounted(() => {
+  getRandomWords()
+      .then(words => {
+        cards.value = words.map((word, index) => ({
+          id: cardId++,
+          word: word.word,
+          translation: word.translation,
+          state: 'closed',
+          status: 'default',
+          number: (index + 1).toString().padStart(2, '0')
+        }))
+      })
+})
+
+const cards = ref([]);
 
 const handleFlip = (cardId) => {
   const card = cards.value.find(c => c.id === cardId)
