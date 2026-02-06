@@ -6,7 +6,7 @@ import {computed} from "vue";
 
 const {weatherCode, temperature, date, isActive} = defineProps({
   weatherCode: {
-    type: String,
+    type: Number,
     required: true
   },
   temperature: {

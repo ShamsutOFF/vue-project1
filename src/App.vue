@@ -1,20 +1,10 @@
 <script setup>
-import Stat from "@/components/Stat.vue";
-import CitySelect from "@/components/CitySelect.vue";
-import Error from "@/components/Error.vue";
-import {computed, onMounted, ref} from "vue";
-import DayCard from "@/components/DayCard.vue";
+import {onMounted, ref} from "vue";
+import PaneRight from "@/components/PaneRight.vue";
 
 const API_ENDPOINT = "https://api.weatherapi.com/v1";
 const apiKey = import.meta.env.VITE_API_KEY;
 
-const errorMap = new Map([
-  [1006, "Указанный город не найден"]
-]);
-
-const errorDisplay = computed(() => {
-  return errorMap.get(error.value?.error?.code) || "Произошла ошибка";
-});
 
 let savedCity = ref("Казань");
 let data = ref({
@@ -30,23 +20,6 @@ onMounted(() => {
   getCity(savedCity.value);
 });
 
-const dataModified = computed(() => {
-  // Всегда возвращаем массив, даже если data.value пустой
-  return [
-    {
-      label: "Температура",
-      stat: data.value?.temperature || "—"
-    },
-    {
-      label: "Влажность",
-      stat: data.value?.humidity || "—"
-    },
-    {
-      label: "Ветер",
-      stat: data.value?.wind || "—"
-    }
-  ];
-});
 
 async function getCity(city) {
   const params = new URLSearchParams({
@@ -96,39 +69,13 @@ async function getCity(city) {
 
     </div>
     <div class="right">
-      <Error v-if="error" :error="errorDisplay"/>
-
-      <!-- Статистика -->
-      <div class="stats-section">
-        <Stat
-            v-for="item in dataModified"
-            v-bind="item"
-            :key="item.label"
-        />
-      </div>
-
-      <!-- Прогноз с карточками -->
-      <div
-          v-if="data && data.forecast && data.forecast.length > 0"
-          class="forecast-section"
-      >
-        <div class="day-card-list">
-          <DayCard
-              v-for="(item, index) in data.forecast"
-              :key="item.date"
-              :date="new Date(item.date)"
-              :temperature="item.day.avgtemp_c"
-              :weather-code="item.day.condition.code"
-              :is-active="activeIndex === index"
-              @click="activeIndex = index"
-          />
-        </div>
-      </div>
-
-      <!-- Выбор города -->
-      <div class="city-select-section">
-        <CitySelect @select-city="getCity"/>
-      </div>
+      <PaneRight
+          :data="data"
+          :error="error"
+          :active-index="activeIndex"
+          @select-index="(index) => activeIndex = index"
+          @select-city="(city) => getCity(city)"
+      />
     </div>
   </main>
 </template>
@@ -139,6 +86,7 @@ async function getCity(city) {
   align-items: center;
   justify-content: center;
 }
+
 .left {
   width: 500px;
   height: 640px;
@@ -156,28 +104,5 @@ async function getCity(city) {
   display: flex;
   flex-direction: column;
   gap: 70px;
-}
-
-/* Секция прогноза */
-.forecast-section {
-  width: 100%;
-}
-
-.day-card-list {
-  width: 420px; /* Фиксированная ширина как у CitySelect */
-  display: flex;
-  gap: 1px; /* или нужное расстояние */
-  justify-content: space-between; /* равномерное распределение */
-}
-
-:deep(.day-card) {
-  flex: 1; /* Растягиваются равномерно */
-  min-width: 0; /* Важно для корректного сжатия текста */
-}
-
-/* Секция выбора города */
-.city-select-section {
-  display: flex;
-  justify-content: center;
 }
 </style>
