@@ -16,7 +16,7 @@ const errorDisplay = computed(() => {
   return errorMap.get(error.value?.error?.code) || "Произошла ошибка";
 });
 
-let savedCity = ref("Moscow");
+let savedCity = ref("Казань");
 let data = ref({
   humidity: "—",
   temperature: "—",
@@ -24,6 +24,7 @@ let data = ref({
   forecast: []
 });
 let error = ref(null);
+let activeIndex = ref(0);
 
 onMounted(() => {
   getCity(savedCity.value);
@@ -70,7 +71,7 @@ async function getCity(city) {
     }
     error.value = null;
     const resData = await response.json();
-    console.log(resData);
+    // console.log(resData);
 
     // Сохраняем текущую погоду
     data.value.humidity = resData.current.humidity + "%";
@@ -109,11 +110,13 @@ async function getCity(city) {
     >
       <div class="day-card-list">
         <DayCard
-            v-for="item in data.forecast"
+            v-for="(item, index) in data.forecast"
             :key="item.date"
             :date="new Date(item.date)"
             :temperature="item.day.avgtemp_c"
             :weather-code="item.day.condition.code"
+            :is-active="activeIndex === index"
+            @click="activeIndex = index"
         />
       </div>
     </div>
