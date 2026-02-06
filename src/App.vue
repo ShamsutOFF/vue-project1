@@ -1,10 +1,139 @@
 <script setup>
-const currentDate = new Date();
+import {onMounted, provide, ref, watch} from "vue";
+import PaneRight from "@/components/PaneRight.vue";
+import {API_ENDPOINT, cityProvide} from "@/constants.js";
+import PaneLeft from "@/components/PaneLeft.vue";
+
+
+const apiKey = import.meta.env.VITE_API_KEY;
+
+let savedCity = ref("Казань");
+let data = ref({
+  humidity: "—",
+  temperature: "—",
+  wind: "—",
+  forecast: []
+});
+let error = ref(null);
+let activeIndex = ref(0);
+let city = ref("Казань"); // Это реактивная ссылка
+
+// Передаем саму реактивную ссылку (ref), а не её значение
+provide(cityProvide, city); // ← БЕЗ .value!
+
+watch(city, () => {
+  getCity(city.value)
+});
+
+onMounted(() => {
+  getCity(savedCity.value);
+});
+
+async function getCity(city) {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 секунд
+
+  try {
+    const params = new URLSearchParams({
+      query: city,
+      key: apiKey,
+      lang: "ru",
+      days: 4
+    });
+
+    const response = await fetch(`${API_ENDPOINT}/forecast.json?${params.toString()}`, {
+      signal: controller.signal // Передаем сигнал отмены
+    });
+
+    clearTimeout(timeoutId) // Очищаем таймер если успешно
+
+    if (!response.ok) {
+      error.value = await response.json();
+      data.value = {
+        humidity: "—",
+        temperature: "—",
+        wind: "—",
+        forecast: []
+      };
+      return;
+    }
+    error.value = null;
+    const resData = await response.json();
+    console.log(resData);
+
+    // Сохраняем текущую погоду
+    data.value.humidity = resData.current.humidity + "%";
+    data.value.temperature = resData.current.temp_c + "°C";
+    data.value.wind = resData.current.wind_kph + " км/ч";
+
+    // Сохраняем прогноз!
+    data.value.forecast = resData.forecast?.forecastday || [];
+
+    savedCity.value = resData.location.name;
+
+  } catch (err) {
+    clearTimeout(timeoutId) // Очищаем в любом случае
+
+    if (err.name === 'AbortError') {
+      error.value = {error: {code: 408, message: "Превышено время ожидания"}}
+      console.error("Запрос отменен по таймауту:", city)
+    } else {
+      error.value = {error: {code: 1006, message: "Ошибка сети"}}
+      console.error("Ошибка запроса:", err)
+    }
+
+    data.value = {
+      humidity: "—",
+      temperature: "—",
+      wind: "—",
+      forecast: []
+    };
+  }
+}
 </script>
 
 <template>
-  <div>{{ currentDate }}</div>
+  <main class="main">
+    <div class="left">
+      <!-- Проверяем наличие данных перед рендерингом -->
+      <PaneLeft
+          v-if="data.forecast && data.forecast.length > 0"
+          :day-data="data.forecast[activeIndex]"/>
+    </div>
+    <div class="right">
+      <PaneRight
+          :data="data"
+          :error="error"
+          :active-index="activeIndex"
+          @select-index="(index) => activeIndex = index"
+          @select-city="(cityName) => getCity(cityName)"
+      />
+    </div>
+  </main>
 </template>
-
 <style scoped>
+.main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.left {
+  width: 500px;
+  height: 640px;
+  border-radius: 30px;
+  background-image: url("./assets/bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.right {
+  background: var(--color-bg-main);
+  padding: 60px 50px;
+  border-radius: 0 25px 25px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 70px;
+}
 </style>
