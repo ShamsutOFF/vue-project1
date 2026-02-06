@@ -1,21 +1,25 @@
 <script setup>
 import IconLocation from "@/icons/IconLocation.vue";
 import Button from "@/components/Button.vue";
-import {ref} from "vue";
+import {inject, ref, watch} from "vue";
 import Input from "@/components/Input.vue";
 
-const emit = defineEmits({
-  selectCity(payload) {
-    return payload;
-  },
-});
+// Получаем реактивную ссылку
+const city = inject("city")
 
-let city = ref("Moscow");
+// Локальное состояние для input
+const inputValue = ref(city.value) // Начальное значение
+
+// Следим за изменениями city и синхронизируем inputValue
+watch(city, (newVal) => {
+  inputValue.value = newVal
+})
+
 let isEdited = ref(false);
 
 function select() {
   isEdited.value = false;
-  emit("selectCity", city.value);
+  city.value = inputValue.value; // Изменяем реактивное значение
 }
 
 function edit() {
@@ -28,13 +32,12 @@ function edit() {
   <div class="city-select">
     <div v-if="isEdited" class="city-input">
       <Input
-          v-model="city"
-          v-focus
+          v-model="inputValue"
           placeholder="Введите город"
           @keyup.enter="select"/>
       <Button @click="select">Сохранить</Button>
     </div>
-    <Button v-else @click="edit()">
+    <Button v-else @click="edit">
       <template #icon>
         <IconLocation/>
       </template>

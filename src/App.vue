@@ -1,10 +1,9 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {onMounted, provide, ref, watch} from "vue";
 import PaneRight from "@/components/PaneRight.vue";
 
 const API_ENDPOINT = "https://api.weatherapi.com/v1";
 const apiKey = import.meta.env.VITE_API_KEY;
-
 
 let savedCity = ref("Казань");
 let data = ref({
@@ -15,11 +14,18 @@ let data = ref({
 });
 let error = ref(null);
 let activeIndex = ref(0);
+let city = ref("Казань"); // Это реактивная ссылка
+
+// Передаем саму реактивную ссылку (ref), а не её значение
+provide("city", city); // ← БЕЗ .value!
+
+watch(city, () => {
+  getCity(city.value)
+});
 
 onMounted(() => {
   getCity(savedCity.value);
 });
-
 
 async function getCity(city) {
   const params = new URLSearchParams({
@@ -44,7 +50,7 @@ async function getCity(city) {
     }
     error.value = null;
     const resData = await response.json();
-    // console.log(resData);
+    console.log(resData);
 
     // Сохраняем текущую погоду
     data.value.humidity = resData.current.humidity + "%";
