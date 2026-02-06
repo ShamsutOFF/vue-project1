@@ -92,47 +92,67 @@ async function getCity(city) {
 
 <template>
   <main class="main">
-    <Error v-if="error" :error="errorDisplay"/>
+    <div class="left">
 
-    <!-- Статистика -->
-    <div class="stats-section">
-      <Stat
-          v-for="item in dataModified"
-          v-bind="item"
-          :key="item.label"
-      />
     </div>
+    <div class="right">
+      <Error v-if="error" :error="errorDisplay"/>
 
-    <!-- Прогноз с карточками -->
-    <div
-        v-if="data && data.forecast && data.forecast.length > 0"
-        class="forecast-section"
-    >
-      <div class="day-card-list">
-        <DayCard
-            v-for="(item, index) in data.forecast"
-            :key="item.date"
-            :date="new Date(item.date)"
-            :temperature="item.day.avgtemp_c"
-            :weather-code="item.day.condition.code"
-            :is-active="activeIndex === index"
-            @click="activeIndex = index"
+      <!-- Статистика -->
+      <div class="stats-section">
+        <Stat
+            v-for="item in dataModified"
+            v-bind="item"
+            :key="item.label"
         />
       </div>
-    </div>
 
-    <!-- Выбор города -->
-    <div class="city-select-section">
-      <CitySelect @select-city="getCity"/>
+      <!-- Прогноз с карточками -->
+      <div
+          v-if="data && data.forecast && data.forecast.length > 0"
+          class="forecast-section"
+      >
+        <div class="day-card-list">
+          <DayCard
+              v-for="(item, index) in data.forecast"
+              :key="item.date"
+              :date="new Date(item.date)"
+              :temperature="item.day.avgtemp_c"
+              :weather-code="item.day.condition.code"
+              :is-active="activeIndex === index"
+              @click="activeIndex = index"
+          />
+        </div>
+      </div>
+
+      <!-- Выбор города -->
+      <div class="city-select-section">
+        <CitySelect @select-city="getCity"/>
+      </div>
     </div>
   </main>
 </template>
 
 <style scoped>
 .main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.left {
+  width: 500px;
+  height: 640px;
+  border-radius: 30px;
+  background-image: url("./assets/bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.right {
   background: var(--color-bg-main);
   padding: 60px 50px;
-  border-radius: 25px;
+  border-radius: 0 25px 25px 0;
   display: flex;
   flex-direction: column;
   gap: 70px;
