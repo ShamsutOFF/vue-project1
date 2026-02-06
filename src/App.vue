@@ -1,8 +1,9 @@
 <script setup>
 import {onMounted, provide, ref, watch} from "vue";
 import PaneRight from "@/components/PaneRight.vue";
+import {API_ENDPOINT, cityProvide} from "@/constants.js";
 
-const API_ENDPOINT = "https://api.weatherapi.com/v1";
+
 const apiKey = import.meta.env.VITE_API_KEY;
 
 let savedCity = ref("Казань");
@@ -17,7 +18,7 @@ let activeIndex = ref(0);
 let city = ref("Казань"); // Это реактивная ссылка
 
 // Передаем саму реактивную ссылку (ref), а не её значение
-provide("city", city); // ← БЕЗ .value!
+provide(cityProvide, city); // ← БЕЗ .value!
 
 watch(city, () => {
   getCity(city.value)

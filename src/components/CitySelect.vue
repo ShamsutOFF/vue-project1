@@ -3,9 +3,10 @@ import IconLocation from "@/icons/IconLocation.vue";
 import Button from "@/components/Button.vue";
 import {inject, ref, watch} from "vue";
 import Input from "@/components/Input.vue";
+import {cityProvide} from "@/constants.js";
 
 // Получаем реактивную ссылку
-const city = inject("city")
+const city = inject(cityProvide)
 
 // Локальное состояние для input
 const inputValue = ref(city.value) // Начальное значение
