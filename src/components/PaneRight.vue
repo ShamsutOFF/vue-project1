@@ -1,5 +1,4 @@
 <script setup>
-
 import Stat from "@/components/Stat.vue";
 import Error from "@/components/Error.vue";
 import DayCard from "@/components/DayCard.vue";
@@ -19,27 +18,56 @@ const errorMap = new Map([
 ]);
 
 const statData = computed(() => {
-  // Всегда возвращаем массив, даже если data.value пустой
+  // Если нет данных, возвращаем значения по умолчанию
+  if (!data || !data.forecast) {
+    return [
+      { label: "Температура", stat: "—" },
+      { label: "Влажность", stat: "—" },
+      { label: "Ветер", stat: "—" }
+    ]
+  }
+
+  // Проверяем, есть ли данные для выбранного дня
+  const selectedDay = data.forecast[activeIndex];
+
+  if (!selectedDay) {
+    // Используем текущие данные
+    return [
+      {
+        label: "Температура",
+        stat: data.temperature || "—"
+      },
+      {
+        label: "Влажность",
+        stat: data.humidity || "—"
+      },
+      {
+        label: "Ветер",
+        stat: data.wind || "—"
+      }
+    ]
+  }
+
+  // Используем данные выбранного дня
   return [
     {
       label: "Температура",
-      stat: data.temperature || "—"
+      stat: `${selectedDay.day.avgtemp_c}°C`
     },
     {
       label: "Влажность",
-      stat: data.humidity || "—"
+      stat: `${selectedDay.day.avghumidity}%`
     },
     {
       label: "Ветер",
-      stat: data.wind || "—"
+      stat: `${selectedDay.day.maxwind_kph} км/ч`
     }
-  ];
+  ]
 });
 
 const errorDisplay = computed(() => {
   return errorMap.get(error.error?.code) || "Произошла ошибка";
 });
-
 </script>
 
 <template>
