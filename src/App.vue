@@ -16,18 +16,23 @@ let cardId = 1;
 onMounted(() => {
   getRandomWords()
       .then(words => {
-        cards.value = words.map((word, index) => ({
-          id: cardId++,
-          word: word.word,
-          translation: word.translation,
-          state: 'closed',
-          status: 'default',
-          number: (index + 1).toString().padStart(2, '0')
-        }))
+        fillCards(words)
       })
 })
 
+function fillCards(words) {
+  cards.value = words.map((word, index) => ({
+    id: cardId++,
+    word: word.word,
+    translation: word.translation,
+    status: 'default',
+    number: (index + 1).toString().padStart(2, '0')
+  }));
+  score.value = 0;
+}
+
 const cards = ref([]);
+const score = ref(0);
 
 const handleFlip = (cardId) => {
   const card = cards.value.find(c => c.id === cardId)
@@ -40,12 +45,24 @@ const handleAnswer = (cardId, isCorrect) => {
   const card = cards.value.find(c => c.id === cardId)
   if (card && card.status === 'flipped') {
     card.status = isCorrect ? 'correct' : 'incorrect'
+    if (isCorrect) {
+      score.value += 10;
+    } else {
+      score.value -= 4;
+    }
   }
+}
+
+const handleNewGame = () => {
+  getRandomWords()
+      .then(words => {
+        fillCards(words)
+      });
 }
 </script>
 
 <template>
-  <Header/>
+  <Header :score="score" />
   <div class="content">
     <div class="cards-container">
       <GameCard
@@ -57,7 +74,7 @@ const handleAnswer = (cardId, isCorrect) => {
       />
     </div>
     <main>
-      <MainButton>Начать игру</MainButton>
+      <MainButton @click="handleNewGame">Начать игру</MainButton>
     </main>
   </div>
 </template>
@@ -77,6 +94,7 @@ const handleAnswer = (cardId, isCorrect) => {
 .cards-container {
   display: flex;
   gap: 20px;
+  max-width: 1200px;
   flex-wrap: wrap;
   justify-content: center;
 }

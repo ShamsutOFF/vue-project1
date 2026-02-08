@@ -1,9 +1,15 @@
 <script setup>
 
+const emit = defineEmits(['new-game']);
+
+const handleClick = () => {
+  emit('new-game');
+}
+
 </script>
 
 <template>
-  <button class="button">
+  <button class="button" @click="handleClick">
     <slot/>
   </button>
 </template>
